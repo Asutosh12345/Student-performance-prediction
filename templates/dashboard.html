@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Student Performance Prediction{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="dashboard">
+        <h2>Model Dashboard</h2>
+        
+        <div class="dashboard-grid">
+            <!-- Model Information -->
+            <div class="dashboard-card">
+                <h3>Model Information</h3>
+                <div class="info-content" id="modelInfo">
+                    <p>Loading...</p>
+                </div>
+            </div>
+
+            <!-- Feature Importance -->
+            <div class="dashboard-card full-width">
+                <h3>Feature Importance</h3>
+                <div class="feature-importance" id="featureImportance">
+                    <p>Loading...</p>
+                </div>
+            </div>
+
+            <!-- Model Metrics -->
+            <div class="dashboard-card">
+                <h3>Model Performance Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-value">90%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">92.31%</div>
+                        <div class="metric-label">Precision</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">92.31%</div>
+                        <div class="metric-label">Recall</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">93.13%</div>
+                        <div class="metric-label">ROC-AUC</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confusion Matrix -->
+            <div class="dashboard-card">
+                <h3>Confusion Matrix</h3>
+                <div class="confusion-matrix">
+                    <table>
+                        <tr>
+                            <td class="empty"></td>
+                            <td class="header">Poor Predicted</td>
+                            <td class="header">Good Predicted</td>
+                        </tr>
+                        <tr>
+                            <td class="header">Poor Actual</td>
+                            <td class="tn">12</td>
+                            <td class="fp">2</td>
+                        </tr>
+                        <tr>
+                            <td class="header">Good Actual</td>
+                            <td class="fn">2</td>
+                            <td class="tp">24</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load model information
+async function loadModelInfo() {
+    try {
+        const response = await fetch('/api/model-stats');
+        const data = await response.json();
+        
+        let html = '<ul>';
+        html += '<li><strong>Model Type:</strong> ' + data.model_type + '</li>';
+        html += '<li><strong>Features:</strong> ' + data.features.join(', ') + '</li>';
+        html += '<li><strong>Classes:</strong> ' + data.classes.join(', ') + '</li>';
+        html += '<li><strong>Status:</strong> <span class="badge badge-' + (data.status === 'ready' ? 'good' : 'poor') + '">' + data.status + '</span></li>';
+        html += '</ul>';
+        
+        document.getElementById('modelInfo').innerHTML = html;
+    } catch (error) {
+        document.getElementById('modelInfo').innerHTML = '<p>Error loading model info</p>';
+    }
+}
+
+// Load feature importance
+async function loadFeatureImportance() {
+    try {
+        const response = await fetch('/api/feature-importance');
+        const data = await response.json();
+        
+        let html = '<div class="importance-list">';
+        for (let i = 0; i < data.features.length; i++) {
+            const coef = data.coefficients[i];
+            const maxCoef = Math.max(...data.coefficients);
+            const percentage = (Math.abs(coef) / Math.abs(maxCoef)) * 100;
+            
+            html += '<div class="importance-item">';
+            html += '<span class="label">' + data.features[i] + '</span>';
+            html += '<div class="bar-container">';
+            html += '<div class="bar" style="width: ' + percentage + '%"></div>';
+            html += '</div>';
+            html += '<span class="value">' + coef.toFixed(4) + '</span>';
+            html += '</div>';
+        }
+        html += '<div class="importance-item">';
+        html += '<span class="label">Intercept</span>';
+        html += '<span class="value">' + data.intercept.toFixed(4) + '</span>';
+        html += '</div>';
+        html += '</div>';
+        
+        document.getElementById('featureImportance').innerHTML = html;
+    } catch (error) {
+        document.getElementById('featureImportance').innerHTML = '<p>Error loading feature importance</p>';
+    }
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadModelInfo();
+    loadFeatureImportance();
+});
+</script>
+{% endblock %}

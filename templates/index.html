@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Student Performance Prediction{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Student Performance Prediction System</h1>
+            <p>Predict student academic performance using Machine Learning</p>
+            <p class="subtitle">Logistic Regression Model for Early Intervention</p>
+            
+            <div class="cta-buttons">
+                <a href="/predict" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i> Make Prediction
+                </a>
+                <a href="/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-dashboard"></i> View Dashboard
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2>How It Works</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3>Data Analysis</h3>
+                <p>Analyzes 5 key academic features to predict student performance</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Machine Learning</h3>
+                <p>Uses Logistic Regression with 90% accuracy model</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>Predictions</h3>
+                <p>Predict individual or batch student performance</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>Early Support</h3>
+                <p>Identify students needing improvement early</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info">
+        <div class="info-box">
+            <h3>Features Analyzed</h3>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> <strong>Attendance</strong> - Class participation percentage</li>
+                <li><i class="fas fa-check"></i> <strong>Internal Marks</strong> - Mid-term examination scores</li>
+                <li><i class="fas fa-check"></i> <strong>Assignment Marks</strong> - Assignment completion scores</li>
+                <li><i class="fas fa-check"></i> <strong>Study Hours</strong> - Weekly study commitment</li>
+                <li><i class="fas fa-check"></i> <strong>Previous Results</strong> - Historical academic performance</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h3>Model Performance</h3>
+            <ul class="metric-list">
+                <li><strong>Accuracy:</strong> <span class="badge">90%</span></li>
+                <li><strong>Precision:</strong> <span class="badge">92.31%</span></li>
+                <li><strong>Recall:</strong> <span class="badge">92.31%</span></li>
+                <li><strong>F1-Score:</strong> <span class="badge">92.31%</span></li>
+                <li><strong>ROC-AUC:</strong> <span class="badge">93.13%</span></li>
+            </ul>
+        </div>
+    </section>
+</div>
+{% endblock %}
