@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Student Performance Prediction System
 
 A machine learning system that predicts student academic performance using Logistic Regression.
@@ -252,3 +253,7 @@ For issues, questions, or suggestions, please refer to the project documentation
 
 **Last Updated**: March 2026  
 **Status**: Complete and Functional
+=======
+# Student-performance-prediction
+machine learning
+>>>>>>> 9626a4d6ba79f9c2700fbc467fda2f2badda38cb
