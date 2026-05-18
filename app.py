@@ -165,13 +165,13 @@ def normalize_student_dataframe(df):
     df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors='coerce')
     df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean().fillna(0.0))
 
-    if not all(col in df.columns for col in ['Attendance', 'Internal_Marks', 'Previous_Results']):
-        missing = [col for col in ['Attendance', 'Internal_Marks', 'Previous_Results'] if col not in df.columns]
+    if not all(col in df.columns for col in ['Attendance', 'Internal_Marks']):
+        missing = [col for col in ['Attendance', 'Internal_Marks'] if col not in df.columns]
         raise ValueError(f'Missing required columns: {missing}')
 
-    if df[['Attendance', 'Internal_Marks', 'Previous_Results']].isnull().any().any():
-        invalid_rows = df[['Attendance', 'Internal_Marks', 'Previous_Results']][
-            df[['Attendance', 'Internal_Marks', 'Previous_Results']].isnull().any(axis=1)
+    if df[['Attendance', 'Internal_Marks']].isnull().any().any():
+        invalid_rows = df[['Attendance', 'Internal_Marks']][
+            df[['Attendance', 'Internal_Marks']].isnull().any(axis=1)
         ]
         raise ValueError(f'Invalid or non-numeric values found in required columns. Please check rows:\n{invalid_rows.head(5)}')
 
