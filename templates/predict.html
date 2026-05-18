@@ -10,10 +10,10 @@
         <div class="prediction-container">
             <!-- Single Prediction Tab -->
             <div class="tabs">
-                <button class="tab-button active" onclick="switchTab('single')">
+                <button class="tab-button active" onclick="switchTab(event, 'single')">
                     <i class="fas fa-user"></i> Single Student
                 </button>
-                <button class="tab-button" onclick="switchTab('batch')">
+                <button class="tab-button" onclick="switchTab(event, 'batch')">
                     <i class="fas fa-users"></i> Batch Upload
                 </button>
             </div>
@@ -23,34 +23,48 @@
                 <form id="predictionForm" class="prediction-form">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="attendance">Attendance (0-100)</label>
-                            <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" required>
-                            <small>Class participation percentage</small>
+                            <label for="student_id">Student ID</label>
+                            <input type="text" id="student_id" name="student_id" placeholder="STU00001" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="internal_marks">Internal Marks (0-50)</label>
+                            <label for="student_name">Student Name</label>
+                            <input type="text" id="student_name" name="student_name" placeholder="Aarav Sharma" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attendance">Attendance (%)</label>
+                            <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" required>
+                            <small>Class attendance percentage (0–100)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attendance_marks">Attendance Marks (0–5)</label>
+                            <input type="number" id="attendance_marks" name="attendance_marks" min="0" max="5" step="0.1">
+                            <small>Attendance evaluation score (optional)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="internal_marks">Internal Marks (0–50)</label>
                             <input type="number" id="internal_marks" name="internal_marks" min="0" max="50" step="0.1" required>
                             <small>Mid-term examination score</small>
                         </div>
 
                         <div class="form-group">
-                            <label for="assignment_marks">Assignment Marks (0-20)</label>
-                            <input type="number" id="assignment_marks" name="assignment_marks" min="0" max="20" step="0.1" required>
-                            <small>Assignment completion score</small>
+                            <label for="previous_grade">Previous Grade</label>
+                            <select id="previous_grade" name="previous_grade" required style="padding:0.75rem;border:2px solid #ecf0f1;border-radius:5px;font-size:1rem;transition:border-color 0.3s ease;">
+                                <option value="">-- Select Grade --</option>
+                                <option value="O">O – Outstanding (≥ 90%)</option>
+                                <option value="A+">A+ (80–89%)</option>
+                                <option value="A">A (70–79%)</option>
+                                <option value="B+">B+ (60–69%)</option>
+                                <option value="B">B (50–59%)</option>
+                                <option value="C">C (40–49%)</option>
+                                <option value="F">F – Fail (&lt; 40%)</option>
+                            </select>
+                            <small>Previous semester / exam grade</small>
                         </div>
 
-                        <div class="form-group">
-                            <label for="study_hours">Study Hours (0-10/week)</label>
-                            <input type="number" id="study_hours" name="study_hours" min="0" max="10" step="0.1" required>
-                            <small>Weekly study hours</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="previous_results">Previous Results (0-100)</label>
-                            <input type="number" id="previous_results" name="previous_results" min="0" max="100" step="0.1" required>
-                            <small>Historical academic performance</small>
-                        </div>
                     </div>
 
                     <div class="form-actions">
@@ -74,12 +88,12 @@
                                 <span class="value" id="performanceText"></span>
                             </div>
                             <div class="result-item">
-                                <span class="label">Confidence:</span>
-                                <span class="value" id="confidenceText"></span>
-                            </div>
-                            <div class="result-item">
                                 <span class="label">Good Performance Probability:</span>
                                 <span class="value good" id="goodProbText"></span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">Average Performance Probability:</span>
+                                <span class="value average" id="averageProbText"></span>
                             </div>
                             <div class="result-item">
                                 <span class="label">Poor Performance Probability:</span>
@@ -140,22 +154,38 @@
                             <div class="stat-label">Good Performance</div>
                         </div>
                         <div class="stat-card">
+                            <div class="stat-number average" id="averageCount">0</div>
+                            <div class="stat-label">Average Performance</div>
+                        </div>
+                        <div class="stat-card">
                             <div class="stat-number poor" id="poorCount">0</div>
                             <div class="stat-label">Poor Performance</div>
                         </div>
+                    </div>
+                    <div class="export-actions">
+                        <button type="button" class="btn btn-light" onclick="exportReport('csv')">
+                            <i class="fas fa-file-csv"></i> Export CSV Report
+                        </button>
+                        <button type="button" class="btn btn-light" onclick="exportReport('xlsx')">
+                            <i class="fas fa-file-excel"></i> Export Excel Report
+                        </button>
+                        <button type="button" class="btn btn-light" onclick="exportReport('pdf')">
+                            <i class="fas fa-file-pdf"></i> Export PDF Report
+                        </button>
                     </div>
                     
                     <div class="table-container">
                         <table id="resultsTable" class="results-table">
                             <thead>
                                 <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
                                     <th>Attendance</th>
+                                    <th>Attendance Marks</th>
                                     <th>Internal Marks</th>
-                                    <th>Assignment Marks</th>
-                                    <th>Study Hours</th>
                                     <th>Previous Results</th>
+                                    <th>Previous Grade</th>
                                     <th>Prediction</th>
-                                    <th>Confidence</th>
                                 </tr>
                             </thead>
                             <tbody id="resultsBody">
@@ -171,7 +201,7 @@
 
 {% block scripts %}
 <script>
-function switchTab(tabName) {
+function switchTab(event, tabName) {
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -182,7 +212,9 @@ function switchTab(tabName) {
 
     // Show selected tab
     document.getElementById(tabName).classList.add('active');
-    event.target.classList.add('active');
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
 }
 
 // Single Prediction
@@ -190,11 +222,12 @@ document.getElementById('predictionForm').addEventListener('submit', async funct
     e.preventDefault();
 
     const data = {
+        student_id: document.getElementById('student_id').value,
+        student_name: document.getElementById('student_name').value,
         attendance: document.getElementById('attendance').value,
+        attendance_marks: document.getElementById('attendance_marks').value,
         internal_marks: document.getElementById('internal_marks').value,
-        assignment_marks: document.getElementById('assignment_marks').value,
-        study_hours: document.getElementById('study_hours').value,
-        previous_results: document.getElementById('previous_results').value
+        previous_grade: document.getElementById('previous_grade').value
     };
 
     try {
@@ -221,18 +254,21 @@ function displayPredictionResult(result) {
     const resultBox = document.getElementById('predictionResult');
     const badge = document.getElementById('performanceBadge');
     
-    if (result.performance === 'Good Performance') {
+    if (result.Performance === 'Good') {
         badge.className = 'performance-badge good-badge';
         badge.innerHTML = '<i class="fas fa-check-circle"></i> Good';
+    } else if (result.Performance === 'Average') {
+        badge.className = 'performance-badge average-badge';
+        badge.innerHTML = '<i class="fas fa-adjust"></i> Average';
     } else {
         badge.className = 'performance-badge poor-badge';
         badge.innerHTML = '<i class="fas fa-exclamation-circle"></i> Poor';
     }
 
-    document.getElementById('performanceText').textContent = result.performance;
-    document.getElementById('confidenceText').textContent = result.confidence + '%';
-    document.getElementById('goodProbText').textContent = result.good_performance_prob + '%';
-    document.getElementById('poorProbText').textContent = result.poor_performance_prob + '%';
+    document.getElementById('performanceText').textContent = result.Performance;
+    document.getElementById('goodProbText').textContent = result.Good_Performance_Probability.toFixed(2) + '%';
+    document.getElementById('averageProbText').textContent = result.Average_Performance_Probability.toFixed(2) + '%';
+    document.getElementById('poorProbText').textContent = result.Poor_Performance_Probability.toFixed(2) + '%';
     
     resultBox.style.display = 'block';
 }
@@ -279,6 +315,7 @@ function uploadCSV() {
 function displayBatchResults(data) {
     document.getElementById('totalCount').textContent = data.total;
     document.getElementById('goodCount').textContent = data.good_count;
+    document.getElementById('averageCount').textContent = data.average_count || 0;
     document.getElementById('poorCount').textContent = data.poor_count;
 
     const tbody = document.getElementById('resultsBody');
@@ -287,18 +324,49 @@ function displayBatchResults(data) {
     data.records.forEach(record => {
         const row = document.createElement('tr');
         row.innerHTML = `
+            <td>${record.Student_ID || ''}</td>
+            <td>${record.Student_Name || ''}</td>
             <td>${record.Attendance}</td>
+            <td>${record.Attendance_Marks}</td>
             <td>${record.Internal_Marks}</td>
-            <td>${record.Assignment_Marks}</td>
-            <td>${record.Study_Hours}</td>
             <td>${record.Previous_Results}</td>
-            <td><span class="badge ${record.Predicted_Performance === 'Good' ? 'badge-good' : 'badge-poor'}">${record.Predicted_Performance}</span></td>
-            <td>${(record.Confidence * 100).toFixed(2)}%</td>
+            <td>${record.Previous_Grade || ''}</td>
+            <td><span class="badge ${record.Predicted_Performance === 'Good' ? 'badge-good' : record.Predicted_Performance === 'Average' ? 'badge-average' : 'badge-poor'}">${record.Predicted_Performance}</span></td>
         `;
         tbody.appendChild(row);
     });
 
     document.getElementById('batchResult').style.display = 'block';
+}
+
+function exportReport(format) {
+    fetch('/api/export-report', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ format })
+    })
+    .then(async response => {
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Export failed');
+        }
+        const blob = await response.blob();
+        const fileExtension = format === 'xlsx' ? 'xlsx' : format === 'pdf' ? 'pdf' : 'csv';
+        const fileName = `performance_report.${fileExtension}`;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+        alert('Export error: ' + error.message);
+    });
 }
 </script>
 {% endblock %}

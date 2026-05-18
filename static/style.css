@@ -499,6 +499,34 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.dashboard-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.metric-card {
+    background: #f9fbff;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #dde7f1;
+}
+
+.metric-card strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--gray-color);
+}
+
+.metric-card p {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
 /* Metrics */
 .metrics-grid {
     display: grid;

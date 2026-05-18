@@ -24,6 +24,54 @@
                 </div>
             </div>
 
+            <!-- Class Analytics -->
+            <div class="dashboard-card full-width">
+                <h3>Class Performance Analytics</h3>
+                <div id="classAnalytics">
+                    <p>Loading class analytics...</p>
+                </div>
+                <div class="form-actions" style="margin-top: 1.5rem; justify-content: flex-start; gap: 1rem;">
+                    <button type="button" class="btn btn-primary" onclick="exportReport('csv')">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="exportReport('xlsx')">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                    <button type="button" class="btn btn-light" onclick="exportReport('pdf')">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Top Students -->
+            <div class="dashboard-card">
+                <h3>Top Students</h3>
+                <div id="topStudents">
+                    <p>Loading top students...</p>
+                </div>
+            </div>
+
+            <!-- Performance Filter -->
+            <div class="dashboard-card full-width">
+                <h3>Filter Students by Performance</h3>
+                <div class="filter-controls" style="margin-bottom: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-light" onclick="loadFilteredStudents('Good')">Good Students</button>
+                    <button type="button" class="btn btn-light" onclick="loadFilteredStudents('Average')">Average Students</button>
+                    <button type="button" class="btn btn-light" onclick="loadFilteredStudents('Poor')">Poor Students</button>
+                </div>
+                <div id="filteredStudents">
+                    <p>Select a category to view filtered results.</p>
+                </div>
+            </div>
+
+            <!-- Weak Students -->
+            <div class="dashboard-card">
+                <h3>Students Needing Improvement</h3>
+                <div id="weakStudents">
+                    <p>Loading weak students...</p>
+                </div>
+            </div>
+
             <!-- Model Metrics -->
             <div class="dashboard-card">
                 <h3>Model Performance Metrics</h3>
@@ -132,6 +180,220 @@ async function loadFeatureImportance() {
 document.addEventListener('DOMContentLoaded', function() {
     loadModelInfo();
     loadFeatureImportance();
+    loadClassAnalytics();
+    loadTopStudents();
+    loadWeakStudents();
 });
+
+async function loadClassAnalytics() {
+    try {
+        const response = await fetch('/api/model-stats');
+        const stats = await response.json();
+
+        const response2 = await fetch('/api/top-students?n=1');
+        const top = await response2.json();
+
+        const response3 = await fetch('/api/weak-students?n=1');
+        const weak = await response3.json();
+
+        const html = `
+            <div class="dashboard-summary-grid">
+                <div class="metric-card">
+                    <strong>Model Status</strong>
+                    <p>${stats.status}</p>
+                </div>
+                <div class="metric-card">
+                    <strong>Top student probability</strong>
+                    <p>${top.records && top.records.length ? top.records[0].Good_Performance_Probability.toFixed(2) + '%' : 'N/A'}</p>
+                </div>
+                <div class="metric-card">
+                    <strong>Lowest student probability</strong>
+                    <p>${weak.records && weak.records.length ? weak.records[0].Good_Performance_Probability.toFixed(2) + '%' : 'N/A'}</p>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('classAnalytics').innerHTML = html;
+    } catch (error) {
+        document.getElementById('classAnalytics').innerHTML = '<p>Error loading analytics</p>';
+    }
+}
+
+async function loadTopStudents() {
+    try {
+        const response = await fetch('/api/top-students?n=5&by=Predicted_Marks');
+        const data = await response.json();
+        if (data.status !== 'success') {
+            document.getElementById('topStudents').innerHTML = '<p>Error loading top students</p>';
+            return;
+        }
+
+        const rows = data.records.map(record => `
+            <tr>
+                <td>${record.Attendance}</td>
+                <td>${record.Internal_Marks}</td>
+                <td>${record.Assignment_Marks}</td>
+                <td>${record.Study_Hours}</td>
+                <td>${record.Previous_Results}</td>
+                <td>${record.Predicted_Performance}</td>
+                <td>${record.Predicted_Marks ? record.Predicted_Marks.toFixed(2) : 'N/A'}</td>
+            </tr>
+        `).join('');
+
+        document.getElementById('topStudents').innerHTML = `
+            <div class="table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Attendance</th>
+                            <th>Internal</th>
+                            <th>Assignment</th>
+                            <th>Study Hours</th>
+                            <th>Previous</th>
+                            <th>Performance</th>
+                            <th>Predicted Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        document.getElementById('topStudents').innerHTML = '<p>Error loading top students</p>';
+    }
+}
+
+async function loadWeakStudents() {
+    try {
+        const response = await fetch('/api/weak-students?n=5');
+        const data = await response.json();
+        if (data.status !== 'success') {
+            document.getElementById('weakStudents').innerHTML = '<p>Error loading weak students</p>';
+            return;
+        }
+
+        const rows = data.records.map(record => `
+            <tr>
+                <td>${record.Attendance}</td>
+                <td>${record.Internal_Marks}</td>
+                <td>${record.Assignment_Marks}</td>
+                <td>${record.Study_Hours}</td>
+                <td>${record.Previous_Results}</td>
+                <td>${record.Predicted_Performance}</td>
+                <td>${record.Good_Performance_Probability ? record.Good_Performance_Probability.toFixed(2) : 'N/A'}%</td>
+            </tr>
+        `).join('');
+
+        document.getElementById('weakStudents').innerHTML = `
+            <div class="table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Attendance</th>
+                            <th>Internal</th>
+                            <th>Assignment</th>
+                            <th>Study Hours</th>
+                            <th>Previous</th>
+                            <th>Performance</th>
+                            <th>Good Probability</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        document.getElementById('weakStudents').innerHTML = '<p>Error loading weak students</p>';
+    }
+}
+
+async function loadFilteredStudents(category) {
+    try {
+        const response = await fetch(`/api/students?performance=${category}&limit=10`);
+        const data = await response.json();
+        const container = document.getElementById('filteredStudents');
+        if (data.status !== 'success') {
+            container.innerHTML = '<p>Error filtering students</p>';
+            return;
+        }
+
+        if (!data.records.length) {
+            container.innerHTML = '<p>No students found for this category.</p>';
+            return;
+        }
+
+        const rows = data.records.map(record => `
+            <tr>
+                <td>${record.Student_ID || ''}</td>
+                <td>${record.Student_Name || ''}</td>
+                <td>${record.Attendance}</td>
+                <td>${record.Attendance_Marks}</td>
+                <td>${record.Internal_Marks}</td>
+                <td>${record.Assignment_Marks}</td>
+                <td>${record.Study_Hours}</td>
+                <td>${record.Previous_Results}</td>
+                <td>${record.Previous_Grade || ''}</td>
+                <td>${record.Pass_Fail || ''}</td>
+                <td>${record.Predicted_Performance}</td>
+                <td>${record.Confidence.toFixed(2)}%</td>
+            </tr>
+        `).join('');
+
+        container.innerHTML = `
+            <div class="table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Attendance</th>
+                            <th>Attendance Marks</th>
+                            <th>Internal</th>
+                            <th>Assignment</th>
+                            <th>Study Hours</th>
+                            <th>Previous Results</th>
+                            <th>Grade</th>
+                            <th>Pass/Fail</th>
+                            <th>Prediction</th>
+                            <th>Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        document.getElementById('filteredStudents').innerHTML = '<p>Unable to load filtered students.</p>';
+    }
+}
+
+async function exportReport(format) {
+    try {
+        const response = await fetch('/api/export-report', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({format})
+        });
+
+        if (!response.ok) {
+            const payload = await response.json();
+            alert('Export failed: ' + (payload.message || 'Unknown error'));
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const extension = format === 'pdf' ? 'pdf' : format === 'xlsx' ? 'xlsx' : 'csv';
+        link.href = url;
+        link.download = `performance_report.${extension}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        alert('Could not export report: ' + error);
+    }
+}
 </script>
 {% endblock %}
